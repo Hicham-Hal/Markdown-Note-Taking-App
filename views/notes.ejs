@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <% if(notes){ %>
+            <% notes.forEach(item => { %>
+                <ul style="list-style: none;">
+                    <li style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h4 style="font-size: 22px;">Title: <span style="font-size: 16px;"><%= item.title %> >>>>>link</span></h4>
+                            <a href="/notes/<%= item.id %>"><%= item.fileName %></a>
+                        </div>
+                        <div style="display: flex; align-items: center; gap:5px;">
+                            <a href=""><button>Update</button></a>
+                            <form action="notes/delete/<%=item.id%>" method="post">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            <% }) %>
+        <% }else{ %>
+            <h4>No notes found</h4>
+        <% } %>
+    </div>
+</body>
+</html>

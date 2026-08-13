@@ -1,0 +1,30 @@
+{
+  "name": "markdown-note-taking-app",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Hicham-Hal/Markdown-Note-Taking-App#readme",
+  "bugs": {
+    "url": "https://github.com/Hicham-Hal/Markdown-Note-Taking-App/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hicham-Hal/Markdown-Note-Taking-App.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.13",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "jsdom": "^30.0.1",
+    "marked": "^18.0.9",
+    "multer": "^2.2.0",
+    "nodemon": "^3.1.14",
+    "uuid": "^14.0.1"
+  }
+}
