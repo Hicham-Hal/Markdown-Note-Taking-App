@@ -4,8 +4,6 @@ import { fileURLToPath } from 'url'
 import createDOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
 import { marked } from 'marked'
-import { v4 as uuidv4 } from 'uuid'
-import multer from 'multer'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -27,6 +25,9 @@ export const getNotes = async(req, res) => {
 
 export const postNotes = async(req, res) => {
     const { title } = req.body
+    if(!title){
+        return res.status(401).json({ msg: 'Title field is required' })
+    }
     let dataNotes = []
     if(!req.file){
         return res.status(401).json({ msg: 'You should implement the markdown file' })
@@ -102,12 +103,12 @@ export const updateNote = async(req, res) => {
         const parsedNotes = JSON.parse(notes)
         const note = parsedNotes.find(item => item.id === id)
         if(!note) return res.status(404).json({ msg: 'no note found' })
+        if(req.file){
+            await fs.promises.unlink(path.join('storage/notes', `${note.id}`))
+        }
         note.title = title;
         note.id = req.file? req.file.filename : note.id
         note.fileName = req.file? req.file.originalname : note.fileName
-        if(req.file){
-            await fs.promises.unlink(path.join('storage/notes', `${id}`))
-        }
         await fs.promises.writeFile(path.join('data', 'notes.json'), JSON.stringify(parsedNotes))
         res.status(200).json(note)
     }catch(err){
