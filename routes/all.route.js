@@ -7,7 +7,7 @@ const upload = multer({ dest: 'storage/notes/' })
 
 route.post('/', upload.single('markdown'), postNotes)
 route.put('/:id', upload.single('markdown'), updateNote)
-route.delete('/delete/:id', deleteNote)
+route.delete('/:id', deleteNote)
 route.get('/', getNotes)
 route.get('/:id', getSingleNote)
 route.get('/grammar/:id', checkGrammar)
