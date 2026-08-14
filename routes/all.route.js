@@ -5,11 +5,11 @@ const route = express.Router()
 const upload = multer({ dest: 'storage/notes/' })
 
 
-route.get('/', getNotes)
 route.post('/', upload.single('markdown'), postNotes)
-route.get('/:id', getSingleNote)
-route.post('/delete/:id', deleteNote)
 route.put('/:id', upload.single('markdown'), updateNote)
+route.delete('/delete/:id', deleteNote)
+route.get('/', getNotes)
+route.get('/:id', getSingleNote)
 route.get('/grammar/:id', checkGrammar)
 
 export default route

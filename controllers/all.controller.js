@@ -26,11 +26,11 @@ export const getNotes = async(req, res) => {
 export const postNotes = async(req, res) => {
     const { title } = req.body
     if(!title){
-        return res.status(401).json({ msg: 'Title field is required' })
+        return res.status(400).json({ msg: 'Title field is required' })
     }
     let dataNotes = []
     if(!req.file){
-        return res.status(401).json({ msg: 'You should implement the markdown file' })
+        return res.status(400).json({ msg: 'You should implement the markdown file' })
     }
     try{
         if(fs.existsSync(path.join('data', 'notes.json'))){
@@ -121,7 +121,16 @@ export const checkGrammar = async(req, res) => {
     const { id } = req.params
     try{
         const file = await fs.promises.readFile(path.join('storage/notes', `${id}`), 'utf8')
-        const params = new URLSearchParams({ text: file, language: 'en-US' })
+        const plainText = file
+            .replace(/```[\s\S]*?```/g, '')     // remove fenced code blocks
+            .replace(/`[^`]+`/g, '')             // remove inline code
+            .replace(/!\[.*?\]\(.*?\)/g, '')     // remove images
+            .replace(/\[([^\]]+)\]\(.*?\)/g, '$1') // links -> keep just the link text
+            .replace(/^#{1,6}\s+/gm, '')         // remove heading markers (#, ##, etc.)
+            .replace(/[*_~]/g, '')               // remove bold/italic/strikethrough markers
+
+        
+        const params = new URLSearchParams({ text: plainText, language: 'en-US' })
         const response = await fetch(`https://api.languagetool.org/v2/check`, {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -131,7 +140,14 @@ export const checkGrammar = async(req, res) => {
             return res.status(502).json({ msg: 'Something went wrong, Bad Gateway' })
         }
         const data = await response.json()
-        return res.status(200).json(data)
+        const simplified = data.matches.map(match => ({
+            message: match.message,
+            issueType: match.rule?.category?.name || 'Other',
+            offset: match.offset,
+            length: match.length,
+            suggestions: match.replacements.slice(0, 3).map(r => r.value)
+        }))
+        return res.status(200).json({ issues: simplified })
     }catch(err){
         console.log(err)
         return res.status(500).json({ msg: 'server error' })
