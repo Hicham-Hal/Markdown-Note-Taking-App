@@ -37,9 +37,6 @@ export const postNotes = async(req, res) => {
             const parsedNotes = JSON.parse(notes)
             dataNotes = parsedNotes
         }
-        if(req.file){
-            return res.status(401).json({ msg: 'No file was implemented' })
-        }
         const newNote = {
             id: req.file.filename,
             title: title,
@@ -87,7 +84,7 @@ export const deleteNote = async(req, res) => {
         const newData = parsedData.filter(item => item.id !== id)
         await fs.promises.unlink(path.join('storage/notes', `${id}`))
         await fs.promises.writeFile(path.join('data', 'notes.json'), JSON.stringify(newData))
-        return res.status(204).json()
+        return res.status(204).end()
     }catch(err){
         console.log(err)
         return res.status(500).json({ msg: 'server error' })
@@ -104,6 +101,7 @@ export const updateNote = async(req, res) => {
         const notes = await fs.promises.readFile(path.join('data', 'notes.json'), 'utf8')
         const parsedNotes = JSON.parse(notes)
         const note = parsedNotes.find(item => item.id === id)
+        if(!note) return res.status(404).json({ msg: 'no note found' })
         note.title = title;
         note.id = req.file? req.file.filename : note.id
         note.fileName = req.file? req.file.originalname : note.fileName
@@ -129,7 +127,7 @@ export const checkGrammar = async(req, res) => {
             body: params
         })
         if(response.status !== 200){
-            return res.status(401).json({ msg: 'Something went wrong' })
+            return res.status(502).json({ msg: 'Something went wrong, Bad Gateway' })
         }
         const data = await response.json()
         return res.status(200).json(data)
