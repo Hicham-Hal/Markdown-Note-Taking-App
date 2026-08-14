@@ -37,6 +37,9 @@ export const postNotes = async(req, res) => {
             const parsedNotes = JSON.parse(notes)
             dataNotes = parsedNotes
         }
+        if(req.file){
+            return res.status(401).json({ msg: 'No file was implemented' })
+        }
         const newNote = {
             id: req.file.filename,
             title: title,
